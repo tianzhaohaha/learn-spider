@@ -1,0 +1,107 @@
+聚焦爬虫--爬去页面的指定内容
+    -编码流程
+        -制定url
+        -发起请求
+        -获取相应数据
+        -数据解析
+        -持久化存储
+
+数据解析
+    -正则
+    -bs4
+    -xpath（*）
+
+数据解析原理概述：
+    -解析的局部文本内容都会在标签之间或者标签对应的属性中存储
+    -1.进行制定的标签定位
+    -2.标签或者标签对应的属性中存储的数据提取
+
+
+a.正则解析：
+
+    <div class="thumb">
+
+    <a href="/article/124747983" target="_blank">
+    <img src="//pic.qiushibaike.com/system/pictures/12474/124747983/medium/YTJ4LMT9K3Y7A9V0.jpg" alt="糗事#124747983" class="illustration" width="100%" height="auto">
+    </a>
+    </div>
+
+    如何对这个html的div下的img图片地址进行提取呢？
+    这里需要用到正则表达式：
+
+    ex = '<div class="thumb">.*?<img src="(.*?)" alt.*?</div>'
+
+
+
+b.bs4解析（只能用于python）
+        原理：
+            -实例化一个BeautifulSoup对象，并将页面源码加载入该对象里
+            -通过调用BeautifulSoup对象里的相关属性和方法进行标签定位和数据提取
+
+        需要用到lxml与bs4库
+
+        -实例化BeautifulSoup对象：
+            from bs4 import BeautifulSoup
+            -1.将本地的一个html加载到该对象中
+            fp = open('./test.html', 'r', encoding = 'utf-8')
+            soup = BeautifulSoup(fp, 'lxml')
+            -2.将互联网上的源码加载到该对象里
+            page_text = response.text
+            soup = BeautifulSoup(page_text, 'lxml')
+        -提供用于解析的方法和属性
+            -soup.TagName
+            -soup.find('TagName')==soup.TagName
+            -soup.select('某种选择器（id， 类， 标签）')#找标签不加前缀，找class前加.，找id前加#
+            -print(soup.select('body > div > div > div')[1])#层级选择器>表示一个层级
+            -out.select('body > div div')#空格表示多个层级
+            -获取标签之间的文本数据：
+                -soup.a.text/string/get_text
+                -text/get_text可以获取某一个标签中所有的文本内容#即便不是直系的文本内容也可以获取**
+            -获取属性名称
+                -soup.a['herf']
+
+
+
+c.Xpath解析
+    -Xpath解析原理：
+        -1.标签定位：实例化以一个etree对象，并将被解析的页面源码数据加载入该对象
+        -2.结合etree对象中的Xpath方法结合着Xpath表达式实现标签定位和内容捕获
+
+    - 如何实例化一个etree对象
+        -1.将本地的html文档源码数据加载到etree对象里
+            etree.parse(filepath)
+        -2.从互联网获取的源码数据加载到对象
+            etree.HTML('page_text')
+        -xpath.('xpath表达式')
+            xpath表达式为核心
+
+    -xpath表达式
+        - / （最左侧）表示从根处开始定位之后每个/代表一个层级
+        - //表示多个层级
+        - //（最左侧）从任意位置开始定位
+
+        - **：属性定位
+            etree.xpath('//div[@class="属性名称"]')
+            此表达式将定位到属性为？？？的div
+            通用表达式含义：xpath('//tag[@attrName=attrValue'']')
+
+
+        -索引定位（***）
+            xpath('//div[@class="song"]/p[3]')#定位名称为'song'的class下第三个p标签
+
+
+
+        -取文本！****
+            xpath('//div[@class="song"]/p[3]/a/text()')#定位名称为'song'的class下第三个p标签下的a标签并取出文本（结果是一个列表，加个【0】就可取出字符串）
+
+        /text()获取的是标签里直系的文本内容
+        //text()获取的事非直系文本，获取此标签下所有的文本内容
+
+
+        -取属性
+            xpath('//div[@class='song']/img/@src')
+            #取属性直接/@attrName
+            #此句取的事song属性div标签下的img标签的src属性！！
+
+
+

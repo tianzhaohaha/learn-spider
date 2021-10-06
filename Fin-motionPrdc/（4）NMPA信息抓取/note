@@ -1,0 +1,11 @@
+#但是NMPA页面的数据并非可以根据http://scxk.nmpa.gov.cn:81/xk/请求到，
+# --因为这些数据是动态加载出来的
+# --页面中对应的企业信息数据是ajax动态请求到的
+# --关注json数据里面的ID信息
+# --http://scxk.nmpa.gov.cn:81/xk/itownet/portal/dzpz.jsp?id=f0ec03b4a6a64823b5362e8d3504ec6d
+# --http://scxk.nmpa.gov.cn:81/xk/itownet/portal/dzpz.jsp?id=01c43d44e5f1461cbbb57c0e4959b7b5
+#关注域名会发现，每家企业信息url只有ID不一样
+#ID值可以从首页对应的XHR请求到的json串得到
+#所以根据每家企业的ID值，可以拼接成每家企业信息的URL值
+
+#ID可以从首页xhr请求得到
